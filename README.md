@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/terahxluna/bifrost.svg)](https://travis-ci.org/terahxluna/bifrost)
+[![Build Status](https://travis-ci.com/terahxluna/bifrost.svg)](https://travis-ci.com/terahxluna/bifrost)
 [![Crates.io](https://img.shields.io/crates/v/bifrost.svg)](https://crates.io/crates/bifrost)
 
 
