@@ -1,0 +1,14 @@
+[package]
+name = "bifrost"
+version = "0.1.0"
+authors = ["Terah <terah.dev@gmail.com>"]
+description = "..."
+homepage = "https://github.com/terahxluna/bifrost"
+repository = "https://github.com/terahxluna/bifrost"
+readme = "README.md"
+keywords = ["event", "dispatched", "eventloop"]
+categories = ["asynchronous"]
+license = "MIT"
+
+[badges]
+travis-ci = { repository = "terahxluna/bifrost" }
