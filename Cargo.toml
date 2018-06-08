@@ -2,11 +2,11 @@
 name = "bifrost"
 version = "0.1.0"
 authors = ["Terah <terah.dev@gmail.com>"]
-description = "..."
+description = "A channel based thread-safe event loop"
 homepage = "https://github.com/terahxluna/bifrost"
 repository = "https://github.com/terahxluna/bifrost"
 readme = "README.md"
-keywords = ["event", "dispatched", "eventloop"]
+keywords = ["event", "dispatch", "eventloop", "channel"]
 categories = ["asynchronous"]
 license = "MIT"
 
