@@ -1,10 +1,10 @@
 #![feature(drain_filter)]
 
-mod event;
-mod relay;
-mod dispatcher;
-mod channel;
-
+pub use dispatcher::*;
 pub use event::*;
 pub use relay::*;
-pub use dispatcher::*;
+
+pub mod event;
+pub mod relay;
+pub mod dispatcher;
+pub mod channel;

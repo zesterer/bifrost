@@ -1,6 +1,6 @@
 [package]
 name = "bifrost"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Terah <terah.dev@gmail.com>"]
 description = "A channel based thread-safe event loop"
 homepage = "https://github.com/terahxluna/bifrost"
