@@ -28,26 +28,6 @@ impl Event<TestContext> for IncrementEvent {
 }
 
 
-// You can schedule event to run after a certain delay
-
-struct StopEvent {}
-
-impl Event<TestContext> for StopEvent {
-    fn process(&self, relay: &Relay<TestContext>, _: &mut TestContext) {
-        relay.schedule(DelayedStopEvent {}, Duration::from_millis(1000));
-    }
-}
-
-struct DelayedStopEvent {}
-
-impl Event<TestContext> for DelayedStopEvent {
-    fn process(&self, relay: &Relay<TestContext>, _: &mut TestContext) {
-        relay.stop()
-    }
-}
-
-
-
 #[test]
 fn simple_test() {
     let mut ctx = TestContext { counter: 0 };
@@ -75,7 +55,14 @@ fn simple_test() {
         }).join().ok();
 
         // Make the dispatcher stop after having processed all the event sent above
-        relay.send(StopEvent {});
+        relay.send(
+            event(|relay, _| {
+                relay.schedule(
+                    event(|relay, _| relay.stop()),
+                    Duration::from_millis(1000)
+                );
+            })
+        );
 
         // Let's run the event loop
         dispatcher.run();
@@ -84,7 +71,7 @@ fn simple_test() {
     println!("Context counter : {}", ctx.counter);
 
     let elapsed = timer.elapsed();
-    let total_time = elapsed.as_secs()*1000 + elapsed.subsec_millis() as u64;
+    let total_time = elapsed.as_secs() * 1000 + elapsed.subsec_millis() as u64;
     let events_per_sec = 1000f32 * (EVENT_COUNT as f32) / total_time as f32;
     println!("{} events dispatched on {} ms", EVENT_COUNT, total_time);
     println!("Average performance : {} events/second", events_per_sec);

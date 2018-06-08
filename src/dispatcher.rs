@@ -48,7 +48,7 @@ pub struct Dispatcher<'a, Context: 'a + Send> {
     event_channel: Channel<BoxedEvent<Context>>,
     command_channel: Channel<Command<Context>>,
     relay: Relay<Context>,
-    env: &'a mut Context,
+    context: &'a mut Context,
 
     running: bool,
 
@@ -59,7 +59,7 @@ pub struct Dispatcher<'a, Context: 'a + Send> {
 }
 
 impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
-    pub fn new(env: &mut Context) -> Dispatcher<Context> {
+    pub fn new(context: &mut Context) -> Dispatcher<Context> {
 
         let event_channel = Channel::<BoxedEvent<Context>>::new();
         let command_channel = Channel::<Command<Context>>::new();
@@ -73,7 +73,7 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
             event_channel,
             command_channel,
             relay,
-            env,
+            context,
             running: false,
             scheduled_events: LinkedList::new(),
             scheduling_precision: Duration::from_millis(DEFAULT_SCHEDULER_PRECISION),
@@ -153,7 +153,7 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
     fn handle_events(&mut self) -> bool {
         match self.event_channel.get_receiver().try_recv() {
             Ok(event) => {
-                event.process(&mut self.relay, &mut self.env);
+                event.process(&mut self.relay, &mut self.context);
                 return true
             },
             Err(err) => {
