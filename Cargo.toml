@@ -6,7 +6,7 @@ description = "A channel based thread-safe event loop"
 homepage = "https://github.com/terahxluna/bifrost"
 repository = "https://github.com/terahxluna/bifrost"
 readme = "README.md"
-keywords = ["event", "dispatch", "eventloop", "channel", "relay", "scheduler"]
+keywords = ["event", "dispatch", "eventloop", "channel", "scheduler"]
 categories = ["asynchronous"]
 license = "MIT"
 
