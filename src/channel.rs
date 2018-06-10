@@ -4,15 +4,15 @@ use std::sync::mpsc::Sender;
 
 pub struct Channel<T> {
     sender: Sender<T>,
-    receiver: Receiver<T>
+    receiver: Receiver<T>,
 }
 
 impl<T> Channel<T> {
     pub fn new() -> Channel<T> {
-        let (sender, receiver)= mpsc::channel();
+        let (sender, receiver) = mpsc::channel();
         Channel {
             sender,
-            receiver
+            receiver,
         }
     }
 

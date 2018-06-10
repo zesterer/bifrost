@@ -1,47 +1,14 @@
 use channel::Channel;
-use event::BoxedEvent;
+use command::Command;
 use relay::Relay;
-use std::sync::mpsc::TryRecvError;
-use std::time::Duration;
+use scheduler::DEFAULT_SCHEDULER_PRECISION;
+use scheduler::ScheduledEvent;
 use std::collections::LinkedList;
-use std::time::Instant;
+use std::sync::mpsc::TryRecvError;
 use std::thread;
-
-pub type EventChannel<Context> = Channel<BoxedEvent<Context>>;
-
-pub enum Command<Context: Send> {
-    Stop,
-    Schedule(BoxedEvent<Context>, Duration),
-}
-
-const DEFAULT_SCHEDULER_PRECISION: u64 = 50; // ms
-
-pub struct ScheduledEvent<Context: Send> {
-    event: BoxedEvent<Context>,
-    delay: Duration,
-}
-
-impl<Context: Send> ScheduledEvent<Context> {
-    pub fn new(event: BoxedEvent<Context>, delay: Duration) -> ScheduledEvent<Context> {
-        ScheduledEvent {
-            event,
-            delay,
-        }
-    }
-
-    pub fn advance(&mut self, duration: Duration) {
-        if self.delay > duration {
-            self.delay -= duration;
-        } else {
-            self.delay = Duration::from_millis(0);
-        }
-
-    }
-
-    pub fn is_ready(&self) -> bool {
-        self.delay == Duration::from_millis(0)
-    }
-}
+use std::time::Duration;
+use std::time::Instant;
+use types::BoxedEvent;
 
 
 pub struct Dispatcher<'a, Context: 'a + Send> {
@@ -58,15 +25,14 @@ pub struct Dispatcher<'a, Context: 'a + Send> {
     scheduling_timer: Instant,
 }
 
-impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
+impl<'a, Context: 'a + Send> Dispatcher<'a, Context> {
     pub fn new(context: &mut Context) -> Dispatcher<Context> {
-
         let event_channel = Channel::<BoxedEvent<Context>>::new();
         let command_channel = Channel::<Command<Context>>::new();
 
         let relay = Relay::new(
             event_channel.get_sender().clone(),
-            command_channel.get_sender().clone()
+            command_channel.get_sender().clone(),
         );
 
         Dispatcher {
@@ -77,7 +43,7 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
             running: false,
             scheduled_events: LinkedList::new(),
             scheduling_precision: Duration::from_millis(DEFAULT_SCHEDULER_PRECISION),
-            scheduling_timer: Instant::now()
+            scheduling_timer: Instant::now(),
         }
     }
 
@@ -89,7 +55,6 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
         self.running = true;
 
         while self.running {
-
             let elapsed = self.scheduling_timer.elapsed();
 
             if elapsed < self.scheduling_precision {
@@ -107,12 +72,11 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
 
     #[inline]
     fn handle_commands(&mut self) -> bool {
-
         match self.command_channel.get_receiver().try_recv() {
             Ok(command) => {
                 self.process_command(command);
-                return true
-            },
+                return true;
+            }
             Err(err) => {
                 match err {
                     TryRecvError::Empty => (),
@@ -121,8 +85,8 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
                         println!("Channel disconnected")
                     }
                 };
-                return false
-            },
+                return false;
+            }
         }
     }
 
@@ -145,7 +109,7 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
             }
         ).for_each(
             |event|
-                sender.send(event.event).unwrap()
+                sender.send(event.get_event()).unwrap()
         );
     }
 
@@ -154,8 +118,8 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
         match self.event_channel.get_receiver().try_recv() {
             Ok(event) => {
                 event.process(&mut self.relay, &mut self.context);
-                return true
-            },
+                return true;
+            }
             Err(err) => {
                 match err {
                     TryRecvError::Empty => (),
@@ -164,8 +128,8 @@ impl<'a, Context: 'a + Send + Sync> Dispatcher<'a, Context> {
                         println!("Channel disconnected");
                     }
                 };
-                return false
-            },
+                return false;
+            }
         }
     }
 }

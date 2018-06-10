@@ -1,10 +1,20 @@
+//! Crate level documentation
+//! Test
+
+
 #![feature(drain_filter)]
 
 pub use dispatcher::*;
 pub use event::*;
+pub use helpers::*;
 pub use relay::*;
 
-pub mod event;
-pub mod relay;
-pub mod dispatcher;
-pub mod channel;
+mod event;
+mod relay;
+mod dispatcher;
+mod channel;
+mod command;
+mod types;
+mod scheduler;
+mod helpers;
+
