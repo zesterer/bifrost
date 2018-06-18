@@ -12,7 +12,7 @@ pub struct GenericEvent<Context, F>
 }
 
 impl<Context: Send, F: Fn(&Relay<Context>, &mut Context)> Event<Context> for GenericEvent<Context, F> {
-    fn process(&self, relay: &Relay<Context>, ctx: &mut Context) {
+    fn process(self: Box<Self>, relay: &Relay<Context>, ctx: &mut Context) {
         (self.handler)(relay, ctx);
     }
 }

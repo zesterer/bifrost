@@ -22,7 +22,7 @@ struct IncrementEvent {
 
 // This is the handler of an event
 impl Event<TestContext> for IncrementEvent {
-    fn process(&self, _: &Relay<TestContext>, ctx: &mut TestContext) {
+    fn process(self: Box<Self>, _: &Relay<TestContext>, ctx: &mut TestContext) {
         ctx.counter += self.val;
     }
 }
